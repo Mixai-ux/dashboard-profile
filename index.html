@@ -1,64 +1,267 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
-    <meta charset="utf-8">
     <title>Анализ соответствия кандидата</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <meta charset="utf-8">
     <style>
+        /* Темная тема с акцентными цветами */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             margin: 0;
             padding: 20px;
-            background-color: #f5f5f5;
+            background-color: #121212;
+            color: #e0e0e0;
         }
+        
         .dashboard-container {
             max-width: 1200px;
             margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background-color: #1e1e1e;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
+        
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
+        
         .row {
             display: flex;
-            margin-bottom: 20px;
-            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 20px;
         }
+        
         .chart-container {
-            background-color: white;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
-            margin: 0 10px;
-        }
-        .gauge-chart {
-            flex: 0 0 40%;
-            max-width: 400px;
-        }
-        .radar-chart {
-            flex: 0 0 55%;
-        }
-        h1 {
-            color: #333;
-        }
-        h2 {
-            color: #555;
-            text-align: center;
-        }
-        .summary {
-            background-color: #f8f9fa;
+            background-color: #252525;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            flex: 1;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
+        
+        .chart-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+        
+        h1 {
+            color: #f5f5f5;
+            font-weight: 400;
+        }
+        
+        h2 {
+            color: #e0e0e0;
+            text-align: center;
+            font-weight: 400;
+            margin-top: 0;
+        }
+        
+        h3 {
+            color: #f5f5f5;
+            font-weight: 500;
+        }
+        
+        .summary {
+            background-color: #2a2a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #4dabf7;
+        }
+        
         .footer {
             text-align: center;
-            margin-top: 30px;
-            color: #777;
+            margin-top: 40px;
+            color: #909090;
             font-size: 0.9em;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+        }
+        
+        /* Custom styles for bullet charts */
+        .bullet-chart {
+            height: 35px;
+            margin: 8px 0;
+            background-color: #333;
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .bullet-chart .range {
+            height: 100%;
+            position: absolute;
+            border-radius: 4px;
+        }
+        
+        .bullet-chart .range-poor {
+            background-color: rgba(255, 99, 71, 0.2);
+            width: 50%;
+        }
+        
+        .bullet-chart .range-avg {
+            background-color: rgba(255, 165, 0, 0.2);
+            width: 70%;
+        }
+        
+        .bullet-chart .range-good {
+            background-color: rgba(46, 204, 113, 0.2);
+            width: 100%;
+        }
+        
+        .bullet-chart .measure {
+            height: 15px;
+            margin-top: 10px;
+            border-radius: 3px;
+            position: absolute;
+        }
+        
+        .bullet-chart .measure-blue {
+            background-color: rgba(31, 119, 180, 0.8);
+        }
+        
+        .bullet-chart .measure-orange {
+            background-color: rgba(255, 127, 14, 0.8);
+        }
+        
+        .bullet-chart .target {
+            position: absolute;
+            height: 35px;
+            width: 2px;
+            background-color: #fff;
+        }
+        
+        .bullet-label {
+            display: flex;
+            justify-content: space-between;
+            color: #ddd;
+            margin-bottom: 5px;
+        }
+        
+        .bullet-label .name {
+            flex: 1;
+        }
+        
+        .bullet-label .score {
+            width: 40px;
+            text-align: right;
+            font-weight: 500;
+        }
+        
+        /* Enhanced radar chart container */
+        .radar-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Legend styling */
+        .legend {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            margin-right: 5px;
+        }
+        
+        .legend-text {
+            font-size: 0.85em;
+            color: #bbb;
+        }
+        
+        /* Gauge customization */
+        .gauge-value {
+            font-size: 2.5em;
+            font-weight: 300;
+            fill: #ffffff;
+        }
+        
+        /* Additional modern touches */
+        .highlight-box {
+            border-left: 4px solid #4dabf7;
+            padding-left: 15px;
+            margin: 15px 0;
+        }
+        
+        .tag {
+            display: inline-block;
+            background-color: #2a2a2a;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .tag.strong {
+            background-color: rgba(46, 204, 113, 0.3);
+            color: #7aeba0;
+        }
+        
+        .tag.improve {
+            background-color: rgba(255, 165, 0, 0.3);
+            color: #ffcc80;
+        }
+        
+        .section-title {
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title:before {
+            content: "";
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            background-color: #4dabf7;
+            display: inline-block;
+            border-radius: 3px;
+        }
+        
+        /* Make Plotly charts more compatible with dark theme */
+        .js-plotly-plot .plotly .main-svg {
+            background-color: transparent !important;
+        }
+        
+        .js-plotly-plot .plotly .bg {
+            fill: transparent !important;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
         }
     </style>
 </head>
@@ -70,141 +273,331 @@
                 <h3>Общий уровень соответствия: 72%</h3>
                 <p>Оценка основана на анализе ключевых компетенций, необходимых для позиции продуктового менеджера
                 с учетом корректировки на способность презентовать стратегический опыт на собеседовании.</p>
+                
+                <div class="tags">
+                    <div class="tag strong">Сильная аналитика</div>
+                    <div class="tag strong">Продуктовый опыт</div>
+                    <div class="tag strong">Управление командами</div>
+                    <div class="tag improve">Визуальные продукты</div>
+                    <div class="tag improve">Презентация стратегии</div>
+                </div>
             </div>
         </div>
         
         <div class="row">
-            <div class="chart-container gauge-chart" id="gauge-chart"></div>
-            <div class="chart-container radar-chart" id="radar-chart"></div>
+            <div class="chart-container">
+                <h2>Общая оценка соответствия</h2>
+                <div id="gauge-chart"></div>
+            </div>
+            <div class="chart-container">
+                <h2>Профиль компетенций кандидата</h2>
+                <div id="radar-chart"></div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: rgba(31, 119, 180, 0.7);"></div>
+                        <div class="legend-text">Оценка кандидата</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: rgba(255, 99, 71, 0.5);"></div>
+                        <div class="legend-text">Идеальное соответствие</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: rgba(255, 165, 0, 0.5);"></div>
+                        <div class="legend-text">Пороговый уровень</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section-title">
+            <h2>Детальная оценка по критериям</h2>
         </div>
         
         <div class="row">
-            <div class="chart-container" id="bar-chart" style="width: 100%;"></div>
+            <div class="chart-container" style="flex: 1;">
+                <!-- Custom bullet charts -->
+                <div class="bullet-label">
+                    <div class="name">Аналитический подход и работа с метриками</div>
+                    <div class="score">9.0</div>
+                </div>
+                <div class="bullet-chart">
+                    <div class="range range-poor"></div>
+                    <div class="range range-avg"></div>
+                    <div class="range range-good"></div>
+                    <div class="measure measure-blue" style="width: 90%;"></div>
+                    <div class="target" style="left: 70%;"></div>
+                </div>
+                
+                <div class="bullet-label">
+                    <div class="name">Общий опыт продуктового управления</div>
+                    <div class="score">8.5</div>
+                </div>
+                <div class="bullet-chart">
+                    <div class="range range-poor"></div>
+                    <div class="range range-avg"></div>
+                    <div class="range range-good"></div>
+                    <div class="measure measure-blue" style="width: 85%;"></div>
+                    <div class="target" style="left: 70%;"></div>
+                </div>
+                
+                <div class="bullet-label">
+                    <div class="name">Управление командами и стейкхолдерами</div>
+                    <div class="score">8.5</div>
+                </div>
+                <div class="bullet-chart">
+                    <div class="range range-poor"></div>
+                    <div class="range range-avg"></div>
+                    <div class="range range-good"></div>
+                    <div class="measure measure-blue" style="width: 85%;"></div>
+                    <div class="target" style="left: 70%;"></div>
+                </div>
+                
+                <div class="bullet-label">
+                    <div class="name">Разработка стратегии</div>
+                    <div class="score">8.0</div>
+                </div>
+                <div class="bullet-chart">
+                    <div class="range range-poor"></div>
+                    <div class="range range-avg"></div>
+                    <div class="range range-good"></div>
+                    <div class="measure measure-blue" style="width: 80%;"></div>
+                    <div class="target" style="left: 70%;"></div>
+                </div>
+                
+                <div class="bullet-label">
+                    <div class="name">Опыт работы с AI/ML</div>
+                    <div class="score">7.5</div>
+                </div>
+                <div class="bullet-chart">
+                    <div class="range range-poor"></div>
+                    <div class="range range-avg"></div>
+                    <div class="range range-good"></div>
+                    <div class="measure measure-orange" style="width: 75%;"></div>
+                    <div class="target" style="left: 70%;"></div>
+                </div>
+                
+                <div class="bullet-label">
+                    <div class="name">Экспертиза в области поиска и SEO</div>
+                    <div class="score">7.0</div>
+                </div>
+                <div class="bullet-chart">
+                    <div class="range range-poor"></div>
+                    <div class="range range-avg"></div>
+                    <div class="range range-good"></div>
+                    <div class="measure measure-orange" style="width: 70%;"></div>
+                    <div class="target" style="left: 70%;"></div>
+                </div>
+                
+                <div class="bullet-label">
+                    <div class="name">Презентация стратегического опыта</div>
+                    <div class="score">6.5</div>
+                </div>
+                <div class="bullet-chart">
+                    <div class="range range-poor"></div>
+                    <div class="range range-avg"></div>
+                    <div class="range range-good"></div>
+                    <div class="measure measure-orange" style="width: 65%;"></div>
+                    <div class="target" style="left: 70%;"></div>
+                </div>
+                
+                <div class="bullet-label">
+                    <div class="name">Коммуникация на уровне senior PM</div>
+                    <div class="score">6.5</div>
+                </div>
+                <div class="bullet-chart">
+                    <div class="range range-poor"></div>
+                    <div class="range range-avg"></div>
+                    <div class="range range-good"></div>
+                    <div class="measure measure-orange" style="width: 65%;"></div>
+                    <div class="target" style="left: 70%;"></div>
+                </div>
+                
+                <div class="bullet-label">
+                    <div class="name">Опыт работы с визуальными продуктами</div>
+                    <div class="score">5.5</div>
+                </div>
+                <div class="bullet-chart">
+                    <div class="range range-poor"></div>
+                    <div class="range range-avg"></div>
+                    <div class="range range-good"></div>
+                    <div class="measure measure-orange" style="width: 55%;"></div>
+                    <div class="target" style="left: 70%;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section-title">
+            <h2>Рекомендации по развитию</h2>
+        </div>
+        
+        <div class="row">
+            <div class="chart-container">
+                <div class="highlight-box">
+                    <h3>Улучшение презентации стратегического опыта</h3>
+                    <p>Фокусироваться на стратегическом аспекте принятых решений, описывать альтернативы и обоснование выбора. Использовать фреймворк STAR с акцентом на "почему", а не "как".</p>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3>Расширение опыта с визуальными продуктами</h3>
+                    <p>Изучить специфику поиска по изображениям и познакомиться с технологиями компьютерного зрения. Исследовать пользовательские сценарии работы с визуальным контентом.</p>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="highlight-box">
+                    <h3>Развитие коммуникации на уровне Senior PM</h3>
+                    <p>Меньше фокуса на операционных метриках, больше на бизнес-импакте и организационном влиянии. Подчеркивать построение процессов и управление командами.</p>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3>Углубление экспертизы в поиске</h3>
+                    <p>Изучить алгоритмы и метрики поисковых систем, особенности ранжирования в поиске изображений и специфику масштабных поисковых платформ.</p>
+                </div>
+            </div>
         </div>
         
         <div class="footer">
             <p>Анализ основан на методологиях: Weighted Scoring Model, Competency Gap Analysis, Learning Curve Prediction и Holland Occupational Fit.</p>
         </div>
     </div>
-
+    
+    <!-- Plotly.js for interactive charts -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    
     <script>
-        // Gauge Chart
-        var gaugeData = [{
-            type: "indicator",
-            mode: "gauge+number",
-            value: 72,
-            domain: {x: [0, 1], y: [0, 1]},
-            title: {text: "Общая оценка соответствия", font: {size: 24}},
-            gauge: {
-                axis: {range: [null, 100], tickwidth: 1, tickcolor: "darkblue"},
-                bar: {color: "darkblue"},
-                bgcolor: "white",
-                borderwidth: 2,
-                bordercolor: "gray",
-                steps: [
-                    {range: [0, 50], color: 'rgba(255, 0, 0, 0.3)'},
-                    {range: [50, 70], color: 'rgba(255, 165, 0, 0.3)'},
-                    {range: [70, 85], color: 'rgba(255, 255, 0, 0.3)'},
-                    {range: [85, 100], color: 'rgba(0, 128, 0, 0.3)'}
-                ],
-                threshold: {
-                    line: {color: "red", width: 4},
-                    thickness: 0.75,
-                    value: 72
+        // Create gauge chart
+        var gaugeData = [
+            {
+                domain: { x: [0, 1], y: [0, 1] },
+                value: 72,
+                title: { text: "" },
+                type: "indicator",
+                mode: "gauge+number",
+                gauge: {
+                    axis: { range: [null, 100], tickwidth: 1, tickcolor: "#444" },
+                    bar: { color: "#4dabf7" },
+                    bgcolor: "rgba(0,0,0,0)",
+                    borderwidth: 0,
+                    steps: [
+                        { range: [0, 50], color: "rgba(255, 99, 71, 0.3)" },
+                        { range: [50, 70], color: "rgba(255, 165, 0, 0.3)" },
+                        { range: [70, 85], color: "rgba(255, 255, 0, 0.3)" },
+                        { range: [85, 100], color: "rgba(46, 204, 113, 0.3)" }
+                    ],
+                    threshold: {
+                        line: { color: "red", width: 3 },
+                        thickness: 0.75,
+                        value: 72
+                    }
+                },
+                number: {
+                    font: {
+                        color: "#ffffff",
+                        family: "Segoe UI",
+                        size: 50
+                    }
                 }
             }
-        }];
+        ];
 
-        var gaugeLayout = {height: 300, margin: {t: 0, b: 0}};
+        var gaugeLayout = {
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(0,0,0,0)",
+            margin: { t: 25, b: 25, l: 25, r: 25 },
+            height: 250,
+            font: {
+                color: "#ddd",
+                family: "Segoe UI"
+            }
+        };
+
         Plotly.newPlot('gauge-chart', gaugeData, gaugeLayout);
+        
+        // Create radar chart
+        var data = [
+            {
+                type: 'scatterpolar',
+                r: [9.0, 8.5, 8.5, 8.0, 7.5, 7.0, 6.5, 6.5, 5.5, 9.0],
+                theta: ['Аналитический подход', 'Опыт продуктового управления', 'Управление командами', 'Разработка стратегии', 'Опыт с AI/ML', 'Экспертиза в поиске', 'Презентация стратегии', 'Коммуникация senior PM', 'Опыт с визуальными продуктами', 'Аналитический подход'],
+                fill: 'toself',
+                fillcolor: 'rgba(31, 119, 180, 0.3)',
+                line: {
+                    color: 'rgba(31, 119, 180, 0.8)',
+                    width: 2
+                },
+                name: 'Оценка кандидата'
+            },
+            {
+                type: 'scatterpolar',
+                r: [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+                theta: ['Аналитический подход', 'Опыт продуктового управления', 'Управление командами', 'Разработка стратегии', 'Опыт с AI/ML', 'Экспертиза в поиске', 'Презентация стратегии', 'Коммуникация senior PM', 'Опыт с визуальными продуктами', 'Аналитический подход'],
+                line: {
+                    color: 'rgba(255, 99, 71, 0.5)',
+                    width: 1,
+                    dash: 'dot'
+                },
+                fill: 'none',
+                name: 'Идеальное соответствие'
+            },
+            {
+                type: 'scatterpolar',
+                r: [7, 7, 7, 7, 7, 7, 7, 7, 7, 7],
+                theta: ['Аналитический подход', 'Опыт продуктового управления', 'Управление командами', 'Разработка стратегии', 'Опыт с AI/ML', 'Экспертиза в поиске', 'Презентация стратегии', 'Коммуникация senior PM', 'Опыт с визуальными продуктами', 'Аналитический подход'],
+                line: {
+                    color: 'rgba(255, 165, 0, 0.6)',
+                    width: 1,
+                    dash: 'dash'
+                },
+                fill: 'none',
+                name: 'Пороговый уровень'
+            }
+        ];
 
-        // Radar Chart
-        var radarData = [{
-            type: 'scatterpolar',
-            r: [9.0, 8.5, 8.5, 8.0, 5.5, 7.0, 7.5, 6.5, 6.5],
-            theta: [
-                'Аналитический подход и работа с метриками',
-                'Общий опыт продуктового управления', 
-                'Управление командами и стейкхолдерами',
-                'Разработка стратегии',
-                'Опыт работы с визуальными/имиджевыми продуктами',
-                'Экспертиза в области поиска и SEO',
-                'Опыт работы с AI/ML',
-                'Презентация стратегического опыта',
-                'Коммуникация на уровне senior PM'
-            ],
-            fill: 'toself',
-            name: 'Оценка кандидата'
-        }, {
-            type: 'scatterpolar',
-            r: [10, 10, 10, 10, 10, 10, 10, 10, 10],
-            theta: [
-                'Аналитический подход и работа с метриками',
-                'Общий опыт продуктового управления', 
-                'Управление командами и стейкхолдерами',
-                'Разработка стратегии',
-                'Опыт работы с визуальными/имиджевыми продуктами',
-                'Экспертиза в области поиска и SEO',
-                'Опыт работы с AI/ML',
-                'Презентация стратегического опыта',
-                'Коммуникация на уровне senior PM'
-            ],
-            fill: 'toself',
-            name: 'Идеальное соответствие'
-        }];
-
-        var radarLayout = {
+        var layout = {
             polar: {
                 radialaxis: {
                     visible: true,
-                    range: [0, 10]
-                }
+                    range: [0, 10],
+                    color: '#666',
+                    tickfont: {
+                        color: '#999'
+                    }
+                },
+                angularaxis: {
+                    color: '#666',
+                    tickfont: {
+                        color: '#999',
+                        size: 10
+                    }
+                },
+                bgcolor: "#252525"
             },
-            showlegend: true,
-            title: 'Профиль компетенций кандидата'
+            showlegend: false,
+            paper_bgcolor: "rgba(0,0,0,0)",
+            plot_bgcolor: "rgba(0,0,0,0)",
+            margin: {
+                l: 10,
+                r: 10,
+                t: 10,
+                b: 10
+            },
+            font: {
+                color: "#ddd",
+                family: "Segoe UI"
+            },
+            height: 350
         };
 
-        Plotly.newPlot('radar-chart', radarData, radarLayout);
-
-        // Bar Chart
-        var barData = [{
-            x: [9.0, 8.5, 8.5, 8.0, 7.5, 7.0, 6.5, 6.5, 5.5],
-            y: [
-                'Аналитический подход и работа с метриками',
-                'Общий опыт продуктового управления', 
-                'Управление командами и стейкхолдерами',
-                'Разработка стратегии',
-                'Опыт работы с AI/ML',
-                'Экспертиза в области поиска и SEO',
-                'Презентация стратегического опыта',
-                'Коммуникация на уровне senior PM',
-                'Опыт работы с визуальными/имиджевыми продуктами'
-            ],
-            type: 'bar',
-            orientation: 'h',
-            marker: {
-                color: [
-                    'rgba(31, 119, 180, 0.8)', 
-                    'rgba(31, 119, 180, 0.8)', 
-                    'rgba(31, 119, 180, 0.8)', 
-                    'rgba(31, 119, 180, 0.8)', 
-                    'rgba(255, 127, 14, 0.8)', 
-                    'rgba(255, 127, 14, 0.8)', 
-                    'rgba(255, 127, 14, 0.8)', 
-                    'rgba(255, 127, 14, 0.8)', 
-                    'rgba(255, 127, 14, 0.8)'
-                ]
-            }
-        }];
-
-        var barLayout = {
-            title: 'Детальная оценка по критериям',
-            xaxis: {title: 'Оценка (0-10)'},
-            height: 500,
-            margin: {l: 300}
-        };
-
-        Plotly.newPlot('bar-chart', barData, barLayout);
+        Plotly.newPlot("radar-chart", data, layout);
+        
+        // Add a slight animation on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.chart-container').forEach(function(container, index) {
+                setTimeout(function() {
+                    container.style.opacity = '1';
+                }, index * 100);
+            });
+        });
     </script>
 </body>
 </html>
